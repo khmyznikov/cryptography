@@ -61,6 +61,7 @@ Changelog
 * The :mod:`X.509 verification <cryptography.x509.verification>` APIs now
   permit ML-DSA-44, ML-DSA-65, and ML-DSA-87 (:rfc:`9881`) public keys and
   signatures by default.
+* We now build ``win_arm64`` (Windows on Arm) wheels and publish them to PyPI.
 
 .. _v49-0-0:
 
