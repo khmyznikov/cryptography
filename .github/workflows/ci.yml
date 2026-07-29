@@ -25,7 +25,6 @@ env:
 
 jobs:
   linux:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -168,7 +167,6 @@ jobs:
       - uses: ./.github/actions/upload-coverage
 
   distros:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     runs-on: ${{ matrix.IMAGE.RUNNER }}
     container: ghcr.io/pyca/cryptography-runner-${{ matrix.IMAGE.IMAGE }}
     strategy:
@@ -227,7 +225,6 @@ jobs:
       - uses: ./.github/actions/upload-coverage
 
   alpine:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     runs-on: ${{ matrix.IMAGE.RUNNER }}
     container:
       image: ghcr.io/pyca/cryptography-runner-${{ matrix.IMAGE.IMAGE }}
@@ -290,7 +287,6 @@ jobs:
       - uses: ./.github/actions/upload-coverage
 
   macos:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     runs-on: macos-26
     strategy:
       fail-fast: false
@@ -391,7 +387,6 @@ jobs:
       - uses: ./.github/actions/upload-coverage
 
   linux-downstream:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -502,7 +497,7 @@ jobs:
     # https://github.community/t/is-it-possible-to-require-all-github-actions-tasks-to-pass-without-enumerating-them/117957/4?u=graingert
     runs-on: ubuntu-latest
     needs: [linux, alpine, distros, macos, windows, linux-downstream]
-    if: ${{ false }}  # TEMP: Windows-only workflow validation (was always())
+    if: always()
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

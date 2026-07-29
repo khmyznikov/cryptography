@@ -54,7 +54,6 @@ jobs:
           path: vectors/dist/cryptography*
 
   manylinux:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     needs: [sdist]
     runs-on: ${{ matrix.MANYLINUX.RUNNER }}
     container:
@@ -176,7 +175,6 @@ jobs:
           path: wheelhouse/
 
   macos:
-    if: ${{ false }}  # TEMP: Windows-only workflow validation
     needs: [sdist]
     runs-on: macos-15
     strategy:
