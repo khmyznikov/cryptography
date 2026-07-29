@@ -34,6 +34,7 @@ use crate::error::CryptographyResult;
 mod asn1;
 mod backend;
 mod buf;
+mod cobblestone;
 mod declarative_asn1;
 mod error;
 mod exceptions;
@@ -132,6 +133,8 @@ mod _rust {
     #[pymodule_export]
     use crate::asn1::asn1_mod;
     #[pymodule_export]
+    use crate::cobblestone::cobblestone_mod;
+    #[pymodule_export]
     use crate::exceptions::exceptions;
     #[pymodule_export]
     use crate::oid::ObjectIdentifier;
@@ -169,7 +172,7 @@ mod _rust {
             load_pem_x509_certificates, Certificate,
         };
         #[pymodule_export]
-        use crate::x509::common::{encode_extension_value, encode_name_bytes};
+        use crate::x509::common::{encode_extension_value, encode_name_bytes, parse_name_bytes};
         #[pymodule_export]
         use crate::x509::crl::{
             create_revoked_certificate, create_x509_crl, load_der_x509_crl, load_pem_x509_crl,
@@ -242,6 +245,8 @@ mod _rust {
         use crate::backend::kdf::kdf;
         #[pymodule_export]
         use crate::backend::keys::keys;
+        #[pymodule_export]
+        use crate::backend::keywrap::keywrap;
         #[cfg(any(
             CRYPTOGRAPHY_IS_BORINGSSL,
             CRYPTOGRAPHY_IS_AWSLC,

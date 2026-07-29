@@ -15,9 +15,6 @@ on:
     workflows: ["Wheel Builder"]
     types: [completed]
 
-env:
-  PUBLISH_REQUIREMENTS_PATH: .github/requirements/publish-requirements.txt
-
 permissions:
   contents: read
 
@@ -27,7 +24,9 @@ jobs:
     # We're not actually verifying that the triggering push event was for a
     # tag, because github doesn't expose enough information to do so.
     # wheel-builder.yml currently only has push events for tags.
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success')
+    # The repository_owner check keeps forks from attempting a publish (or
+    # requesting OIDC tokens/attestations) if a tag is ever pushed to one.
+    if: github.repository_owner == 'pyca' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'))
     permissions:
       id-token: "write"
       attestations: "write"
@@ -44,12 +43,12 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'testpypi'
 
       - name: Setup python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
         timeout-minutes: 3
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: ci-constraints-requirements.txt
           sparse-checkout-cone-mode: false

@@ -46,7 +46,8 @@ Serialization
     Serialize an ASN.1 object into DER-encoded bytes.
 
     :param value: The ASN.1 object to encode. Must be an instance of a
-        class decorated with :func:`sequence` or :func:`set`, or a primitive ASN.1 type
+        class decorated with :func:`sequence`, :func:`set`, or
+        :func:`value_set`, or a primitive ASN.1 type
         (``int``, ``bool``, ``bytes``, ``str``,
         :class:`~cryptography.x509.ObjectIdentifier`,
         :class:`PrintableString`, :class:`IA5String`, :class:`UTCTime`,
@@ -76,6 +77,31 @@ The following built-in Python types are supported as ASN.1 field types:
 
 Additionally, :class:`~cryptography.x509.ObjectIdentifier` maps to
 ``OBJECT IDENTIFIER``.
+
+.. versionadded:: 49.0.0
+
+:class:`~cryptography.x509.Certificate`,
+:class:`~cryptography.x509.CertificateSigningRequest`, and
+:class:`~cryptography.x509.CertificateRevocationList` can also be used as
+field types. They are encoded by embedding their DER serialization, and
+decoded by parsing the field as the corresponding X.509 object. These
+fields cannot have :class:`Implicit` annotations.
+
+.. versionadded:: 50.0.0
+
+:class:`~cryptography.x509.Name` can also be used as a field type. It is
+encoded and decoded as an X.509 ``Name`` (a ``SEQUENCE OF
+RelativeDistinguishedName``), and supports :class:`Implicit` and
+:class:`Explicit` annotations.
+
+.. code-block:: python
+
+    from cryptography import x509
+    from cryptography.hazmat import asn1
+
+    @asn1.sequence
+    class Example:
+        cert: x509.Certificate
 
 The following decorators and types are provided for the rest of the ASN.1 types
 that have no direct Python equivalent:
@@ -135,6 +161,39 @@ that have no direct Python equivalent:
         Traceback (most recent call last):
             ...
         ValueError: error parsing asn1 value: ...
+
+.. decorator:: value_set(value_type)
+
+    A class decorator that registers an :class:`enum.Enum` subclass as an
+    ASN.1 value set: a set of named values of a single underlying type.
+    All the member values must be instances of ``value_type``.
+
+    Members are encoded exactly as their underlying value. When decoding,
+    the value is decoded and mapped back to the corresponding enum member;
+    decoding fails with :class:`ValueError` if the decoded value does not
+    match any member.
+
+    Fields of a value set type can be annotated with :class:`Explicit`,
+    :class:`Implicit`, and :class:`Default` using :class:`typing.Annotated`.
+
+    :param value_type: The underlying ASN.1 type of the member values.
+    :type value_type: :class:`type`
+
+    .. doctest::
+
+        >>> import enum
+        >>> from cryptography import x509
+        >>> from cryptography.hazmat import asn1
+        >>> @asn1.value_set(x509.ObjectIdentifier)
+        ... class HashAlgorithm(enum.Enum):
+        ...     SHA_256 = x509.ObjectIdentifier("2.16.840.1.101.3.4.2.1")
+        ...     SHA_384 = x509.ObjectIdentifier("2.16.840.1.101.3.4.2.2")
+        >>> @asn1.sequence
+        ... class Example:
+        ...     algorithm: HashAlgorithm
+        >>> encoded = asn1.encode_der(Example(algorithm=HashAlgorithm.SHA_256))
+        >>> asn1.decode_der(Example, encoded).algorithm
+        <HashAlgorithm.SHA_256: <ObjectIdentifier(oid=2.16.840.1.101.3.4.2.1, name=sha256)>>
 
 .. class:: PrintableString(value)
 

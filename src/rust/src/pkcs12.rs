@@ -103,13 +103,13 @@ pub(crate) fn symmetric_encrypt(
         ciphers::CipherContext::new(py, algorithm, mode, openssl::symm::Mode::Encrypt)?;
 
     let mut ciphertext = vec![0; data.len() + (block_size / 8 * 2)];
-    let n = cipher.update_into(py, data, &mut ciphertext)?;
+    let n = cipher.update_into(data, &mut ciphertext)?;
 
     let mut padder = PKCS7PaddingContext::new(block_size);
     assert!(padder.update(CffiBuf::from_bytes(py, data))?.is_none());
     let padding = padder.finalize(py)?;
 
-    let pad_n = cipher.update_into(py, padding.as_bytes(), &mut ciphertext[n..])?;
+    let pad_n = cipher.update_into(padding.as_bytes(), &mut ciphertext[n..])?;
     let final_block = cipher.finalize(py)?;
     assert!(final_block.as_bytes().is_empty());
     ciphertext.truncate(n + pad_n);
@@ -578,7 +578,7 @@ fn decode_p12(
 
     if let Err(e) = asn1::parse_single::<cryptography_x509::pkcs12::Pfx<'_>>(data.as_bytes()) {
         let warning_cls = pyo3::exceptions::PyUserWarning::type_object(py);
-        let message = std::ffi::CString::new(format!("PKCS#12 bundle could not be parsed as DER, falling back to parsing as BER. Please file an issue at https://github.com/pyca/cryptography/issues explaining how your PKCS#12 bundle was created. In the future, this may become an exception. Error details: {e}")).unwrap();
+        let message = std::ffi::CString::new(format!("PKCS#12 bundle could not be parsed as DER, falling back to parsing as BER. In the future, this may become an exception. Error details: {e}")).unwrap();
         pyo3::PyErr::warn(py, &warning_cls, &message, 1)?;
     }
 

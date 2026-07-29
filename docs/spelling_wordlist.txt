@@ -5,6 +5,7 @@ argon2
 argon2id
 Authenticator
 authenticator
+Authenticode
 AVX
 backend
 Backends
@@ -23,6 +24,7 @@ CentOS
 changelog
 Changelog
 ciphertext
+Cobblestone
 codebook
 committer
 committers
@@ -41,6 +43,7 @@ Decapsulate
 Decapsulation
 declaratively
 decrypt
+Decryptor
 decrypts
 Decrypts
 decrypted
@@ -60,6 +63,7 @@ duplicative
 El
 embeddability
 Encodings
+Encryptor
 endian
 Euler
 extendable
@@ -69,8 +73,10 @@ Fernet
 fernet
 FIPS
 Gaynor
+GiB
 Google
 Graviola
+hasher
 hazmat
 Heartbleed
 Homebrew
@@ -88,6 +94,7 @@ iterable
 Kehrer
 Kerberos
 Keychain
+keystream
 KiB
 kibibyte
 kibibytes
@@ -118,6 +125,7 @@ parsers
 Parsers
 PEM
 PHC
+PiB
 pickleable
 plaintext
 Poly
@@ -162,6 +170,7 @@ tunable
 Ubuntu
 unencrypted
 unicode
+uninstantiated
 unpadded
 unpadding
 unsafety

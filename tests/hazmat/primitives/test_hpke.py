@@ -8,6 +8,7 @@ import hashlib
 import itertools
 import json
 import os
+import typing
 
 import pytest
 
@@ -91,15 +92,43 @@ SUPPORTED_SUITES = list(
 class TestHPKE:
     def test_invalid_kem_type(self):
         with pytest.raises(TypeError):
-            Suite("not a kem", KDF.HKDF_SHA256, AEAD.AES_128_GCM)  # type: ignore[arg-type]
+            Suite(
+                typing.cast(typing.Any, "not a kem"),
+                KDF.HKDF_SHA256,
+                AEAD.AES_128_GCM,
+            )
 
     def test_invalid_kdf_type(self):
         with pytest.raises(TypeError):
-            Suite(KEM.X25519, "not a kdf", AEAD.AES_128_GCM)  # type: ignore[arg-type]
+            Suite(
+                KEM.X25519,
+                typing.cast(typing.Any, "not a kdf"),
+                AEAD.AES_128_GCM,
+            )
 
     def test_invalid_aead_type(self):
         with pytest.raises(TypeError):
-            Suite(KEM.X25519, KDF.HKDF_SHA256, "not an aead")  # type: ignore[arg-type]
+            Suite(
+                KEM.X25519,
+                KDF.HKDF_SHA256,
+                typing.cast(typing.Any, "not an aead"),
+            )
+
+    @pytest.mark.parametrize(
+        "kem,expected",
+        [
+            (KEM.X25519, X25519_ENC_LENGTH),
+            (KEM.P256, P256_ENC_LENGTH),
+            (KEM.P384, P384_ENC_LENGTH),
+            (KEM.P521, P521_ENC_LENGTH),
+            (KEM.MLKEM768, MLKEM768_ENC_LENGTH),
+            (KEM.MLKEM1024, MLKEM1024_ENC_LENGTH),
+            (KEM.MLKEM768_X25519, MLKEM768_X25519_ENC_LENGTH),
+            (KEM.MLKEM1024_P384, MLKEM1024_P384_ENC_LENGTH),
+        ],
+    )
+    def test_enc_length(self, kem, expected):
+        assert kem.enc_length() == expected
 
     @pytest.mark.parametrize("kem,kdf,aead", SUPPORTED_SUITES)
     def test_roundtrip(self, backend, kem, kdf, aead):
@@ -640,17 +669,25 @@ class TestHPKE:
 
         # Wrong type for mlkem_key in private constructor.
         with pytest.raises(TypeError):
-            MLKEM768X25519PrivateKey(x25519_sk, x25519_sk)  # type: ignore[arg-type]
+            MLKEM768X25519PrivateKey(
+                typing.cast(typing.Any, x25519_sk), x25519_sk
+            )
         # Wrong type for x25519_key in private constructor.
         with pytest.raises(TypeError):
-            MLKEM768X25519PrivateKey(mlkem_sk, mlkem_sk)  # type: ignore[arg-type]
+            MLKEM768X25519PrivateKey(
+                mlkem_sk, typing.cast(typing.Any, mlkem_sk)
+            )
 
         # Wrong type for mlkem_key in public constructor.
         with pytest.raises(TypeError):
-            MLKEM768X25519PublicKey(x25519_pk, x25519_pk)  # type: ignore[arg-type]
+            MLKEM768X25519PublicKey(
+                typing.cast(typing.Any, x25519_pk), x25519_pk
+            )
         # Wrong type for x25519_key in public constructor.
         with pytest.raises(TypeError):
-            MLKEM768X25519PublicKey(mlkem_pk, mlkem_pk)  # type: ignore[arg-type]
+            MLKEM768X25519PublicKey(
+                mlkem_pk, typing.cast(typing.Any, mlkem_pk)
+            )
 
     @pytest.mark.supported(
         only_if=lambda backend: (
@@ -749,20 +786,22 @@ class TestHPKE:
 
         # Wrong type for mlkem_key in private constructor.
         with pytest.raises(TypeError):
-            MLKEM1024P384PrivateKey(p384_sk, p384_sk)  # type: ignore[arg-type]
+            MLKEM1024P384PrivateKey(typing.cast(typing.Any, p384_sk), p384_sk)
         # Wrong type for p384_key in private constructor.
         with pytest.raises(TypeError):
-            MLKEM1024P384PrivateKey(mlkem_sk, mlkem_sk)  # type: ignore[arg-type]
+            MLKEM1024P384PrivateKey(
+                mlkem_sk, typing.cast(typing.Any, mlkem_sk)
+            )
         # Wrong EC curve for p384_key in private constructor.
         with pytest.raises(TypeError):
             MLKEM1024P384PrivateKey(mlkem_sk, p256_sk)
 
         # Wrong type for mlkem_key in public constructor.
         with pytest.raises(TypeError):
-            MLKEM1024P384PublicKey(p384_pk, p384_pk)  # type: ignore[arg-type]
+            MLKEM1024P384PublicKey(typing.cast(typing.Any, p384_pk), p384_pk)
         # Wrong type for p384_key in public constructor.
         with pytest.raises(TypeError):
-            MLKEM1024P384PublicKey(mlkem_pk, mlkem_pk)  # type: ignore[arg-type]
+            MLKEM1024P384PublicKey(mlkem_pk, typing.cast(typing.Any, mlkem_pk))
         # Wrong EC curve for p384_key in public constructor.
         with pytest.raises(TypeError):
             MLKEM1024P384PublicKey(mlkem_pk, p256_pk)
